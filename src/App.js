@@ -1,23 +1,36 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import UserList from './components/UserList';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import UserDetails from './components/UserDetails';
+import axios from 'axios';
+
 
 function App() {
+  const [listOfUser, setListOfUser] = useState(null);
+  const [waiting, setWaiting] = useState(true);
+  useEffect(() => {
+    try {
+      const getUsers = async () => {
+        const res = await axios.get('https://jsonplaceholder.typicode.com/users');
+        setListOfUser(res.data);
+        setWaiting(false);
+      } 
+      getUsers();
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          <Route path="/" element={<UserList data={listOfUser} waiting={waiting} />} />
+          <Route path="/user/:id" element={<UserDetails />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
